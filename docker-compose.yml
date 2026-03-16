@@ -1,0 +1,35 @@
+version: "3.9"
+
+services:
+
+  postgres_db:
+    build: ./database
+    container_name: postgres_db
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      macvlan_net:
+        ipv4_address: 192.168.50.10
+
+  node_backend:
+    build: ./backend
+    container_name: node_backend
+    environment:
+      DB_HOST: postgres_db
+      POSTGRES_DB: mydb
+      POSTGRES_USER: admin
+      POSTGRES_PASSWORD: admin123
+    depends_on:
+      - postgres_db
+    networks:
+      macvlan_net:
+        ipv4_address: 192.168.50.20
+    ports:
+      - "3000:3000"
+
+volumes:
+  postgres_data:
+
+networks:
+  macvlan_net:
+    external: true
